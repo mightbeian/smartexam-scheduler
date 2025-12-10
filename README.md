@@ -36,60 +36,177 @@ SmartExam Scheduler is a sophisticated web-based application designed to solve t
 - **Charts**: Recharts for data visualization
 - **Icons**: Lucide React
 
-## 📊 ML Research Documentation
+## 🔬 How It Works
 
-This project includes comprehensive ML research documentation:
+### Genetic Algorithm Implementation
 
-- 📄 **[PART 1: Introduction](PART1_Introduction.md)** - Problem statement, hypothesis, scope
-- 📄 **[PART 2: Data & Ethics](PART2_Data_Ethics.md)** - Dataset specifications, privacy considerations  
-- 📄 **[PART 3: Preprocessing & Features](PART3_Preprocessing_Features.md)** - Feature engineering, data preparation
-- 📄 **[PART 4: Development & Evaluation](PART4_Development_Evaluation.md)** - Baseline models, GA implementation, evaluation with 95% CI
-- 📄 **[PART 5: Discussion](PART5_Discussion.md)** - Feature analysis, limitations, domain transfer, novel contributions
-- 📄 **[PART 6: Video Demonstration](PART6_Video_Script.md)** - Complete demonstration script and guidelines
-
-## 🚀 Quick Start
-
-See **[QUICKSTART.md](QUICKSTART.md)** for detailed setup instructions.
-
-### Quick Commands
-
-```bash
-# Backend
-cd backend && pip install -r requirements.txt && python main.py
-
-# Frontend  
-cd frontend && npm install && npm run dev
-```
-
-## 📐 How It Works
-
-The Genetic Algorithm optimizes exam schedules through evolution:
-
-1. **Initialize** population of random schedules
-2. **Evaluate** fitness (minimize conflicts)
-3. **Select** best candidates via tournament selection  
-4. **Crossover** parents to create offspring (80%)
-5. **Mutate** for diversity (20%)
-6. **Iterate** for 500-1000 generations
+1. **Initialization**: Create a population of random exam schedules
+2. **Evaluation**: Calculate fitness score based on conflicts
+3. **Selection**: Use tournament selection to choose parent schedules
+4. **Crossover**: Combine parents to create offspring (80% probability)
+5. **Mutation**: Apply random changes to maintain diversity (20% probability)
+6. **Elitism**: Preserve best solutions across generations
+7. **Iteration**: Repeat for specified number of generations
 
 ### Fitness Function
 
-**Hard Constraints** (must satisfy):
-- No student conflicts: 10,000 penalty
-- No room double-booking: 8,000 penalty
-- Room capacity respected: 5,000 penalty
+The fitness function evaluates schedules based on:
 
-**Soft Constraints** (should optimize):
-- Minimize back-to-back exams: 50 penalty
-- Optimize room utilization: 20-30 penalty
-- Balance time slot distribution: 10 penalty/excess
+**Hard Constraints (Heavy Penalties):**
+- No student in multiple exams simultaneously (10,000 penalty)
+- No room double-booking (8,000 penalty)
+- Room capacity not exceeded (5,000 penalty)
 
-## 📊 Performance Metrics
+**Soft Constraints (Light Penalties):**
+- Minimize back-to-back exams for students (50 penalty)
+- Optimize room utilization (20-30 penalty)
+- Balance exam distribution across time slots (10 penalty per excess)
 
-- ✅ **100% Success Rate** - Zero hard conflicts
-- ✅ **342.7 ± 48.3 Soft Conflicts** - Superior quality
-- ✅ **287 Generations Average** - Fast convergence
-- ✅ **< 60 seconds** - Quick optimization
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.9 or higher
+- Node.js 16 or higher
+- npm or yarn
+
+### Backend Setup
+
+```bash
+cd backend
+
+# Create virtual environment (optional but recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the server
+python main.py
+```
+
+The backend API will be available at `http://localhost:8000`
+
+### Frontend Setup
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The frontend will be available at `http://localhost:3000`
+
+## 📊 Datasets
+
+### Required CSV Files
+
+The system expects the following CSV files:
+
+1. **courses.csv**
+   ```
+   course_id,course_name,professor_id
+   CS101,Intro to Programming,P01
+   MATH201,Calculus II,P02
+   ```
+
+2. **students.csv**
+   ```
+   student_id,student_name
+   S0001,John Doe
+   S0002,Jane Smith
+   ```
+
+3. **rooms.csv**
+   ```
+   room_id,capacity
+   Room101,50
+   Room102,80
+   ```
+
+4. **timeslots.csv**
+   ```
+   timeslot_id,day,time
+   T01,Monday,09:00-12:00
+   T02,Monday,13:00-16:00
+   ```
+
+5. **enrollment.csv**
+   ```
+   student_id,course_id
+   S0001,CS101
+   S0001,MATH201
+   ```
+
+### Generate Synthetic Data
+
+The system can automatically generate realistic test data:
+- 500 students
+- 40 courses
+- 10 rooms
+- 15 time slots
+- ~2000 enrollment records
+
+## 🎛️ Algorithm Parameters
+
+### Configurable Parameters
+
+- **Population Size** (50-200 recommended): Number of candidate solutions per generation
+- **Generations** (500-1000 recommended): Number of evolution iterations
+- **Crossover Rate** (0.7-0.9 recommended): Probability of combining parent solutions
+- **Mutation Rate** (0.1-0.3 recommended): Probability of random changes
+
+### Typical Results
+
+With recommended parameters:
+- **Hard Conflicts**: 0 (perfect solution)
+- **Soft Conflict Score**: 200-500 (good quality)
+- **Convergence**: Usually within 500-800 generations
+
+## 📐 Mathematical Model
+
+The exam timetabling problem is formulated as a **Constraint Satisfaction Optimization Problem (CSOP)**:
+
+**Decision Variables:**
+- Assignment of exam *e* to room *r* and timeslot *t*
+
+**Objective:**
+- Minimize: `Fitness = Hard_Penalty × 10000 + Soft_Penalty`
+
+**Subject to:**
+- ∀ student *s*: No overlapping exams
+- ∀ room *r*, timeslot *t*: At most one exam
+- ∀ exam *e*: Enrolled students ≤ Room capacity
+
+## 🛣️ API Endpoints
+
+### Data Management
+- `POST /api/generate-data` - Generate synthetic data
+- `POST /api/upload-csv` - Upload CSV files
+- `GET /api/data/{entity}` - Get courses, students, rooms, etc.
+
+### Optimization
+- `POST /api/optimize` - Start optimization
+- `GET /api/optimize/status` - Get current status
+
+### Schedules
+- `GET /api/schedules` - List all schedules
+- `GET /api/schedules/latest` - Get most recent schedule
+- `GET /api/schedules/{id}` - Get specific schedule
+
+## 🎓 Academic Context
+
+This project demonstrates key computational science principles:
+
+1. **Mathematical Modeling**: Translating real-world scheduling into formal CSOP
+2. **Combinatorial Optimization**: Solving NP-hard problem with heuristics
+3. **Metaheuristic Algorithms**: Using Genetic Algorithm for complex search
+4. **Simulation & Evaluation**: Iterative compute-evaluate-refine methodology
 
 ## 👥 Team
 
@@ -99,8 +216,17 @@ The Genetic Algorithm optimizes exam schedules through evolution:
 
 ## 📝 License
 
-MIT License - University Finals Laboratory Project
+This project is part of a university finals laboratory project.
+
+## 🙏 Acknowledgments
+
+- Inspired by research in exam timetabling and constraint satisfaction
+- Built with modern web technologies and computational science principles
+- Uses established Genetic Algorithm methodologies
 
 ---
 
-**🎓 Computational Science Project | 🧬 Genetic Algorithm | 📅 Exam Scheduling**
+**Project Type**: Computational Science - Resource Scheduling  
+**Algorithm**: Genetic Algorithm with Constraint Satisfaction  
+**Domain**: University Exam Timetabling  
+**Status**: Production Ready v1.0.0
